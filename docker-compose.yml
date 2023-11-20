@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15.1
+    container_name: db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: audio_db
+    networks:
+      - nestjs-api_network
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: storage
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: 123456789
+    networks:
+      - nestjs-api_network
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  minio_create_bucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://host.docker.internal:9000 admin 123456789;
+      /usr/bin/mc mb myminio/files;
+      /usr/bin/mc anonymous set download myminio/files;
+      exit 0;
+      "
+
+  app:
+    container_name: app
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      - MINIO_HOST=host.docker.internal
+      - DB_HOST=db
+    ports:
+      - 5010:5010
+    networks:
+      - nestjs-api_network
+    depends_on:
+      - db
+      - minio
+
+networks:
+  nestjs-api_network:
+    driver: bridge
+
+volumes:
+  minio_data:
+  db_data:
