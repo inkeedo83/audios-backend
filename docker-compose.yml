@@ -40,21 +40,21 @@ services:
       exit 0;
       "
 
-  app:
-    container_name: app
-    build:
-      dockerfile: Dockerfile
-      context: .
-    environment:
-      - MINIO_HOST=host.docker.internal
-      - DB_HOST=db
-    ports:
-      - 5010:5010
-    networks:
-      - nestjs-api_network
-    depends_on:
-      - db
-      - minio
+  # app:
+  #   container_name: app
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: .
+  #   environment:
+  #     - MINIO_HOST=host.docker.internal
+  #     - DB_HOST=db
+  #   ports:
+  #     - 5010:5010
+  #   networks:
+  #     - nestjs-api_network
+  #   depends_on:
+  #     - db
+  #     - minio
 
 networks:
   nestjs-api_network:

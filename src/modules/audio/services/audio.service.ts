@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MinioClientService } from 'src/modules/minio/services/minio.service';
 import { Audio } from '../entities/audio.entity';
 import { Repository } from 'typeorm';
-import { ReadRecordsDto, UpdateRecordDto } from '../types/types';
+import { AudioDto, ReadRecordsDto, UpdateRecordDto } from '../types/types';
 import { omit } from 'lodash';
 
 @Injectable()
@@ -19,11 +19,11 @@ export class AudioService {
     imageFile: Express.Multer.File | null,
     audioFile: Express.Multer.File,
   ) {
-    const { url: imageUrl, filename: imageFilename } = imageFile
+    const { filename: imageFilename } = imageFile
       ? await this.minioService.upload(imageFile)
       : this.minioService.getDefaultImage();
 
-    const { url: audioUrl, filename: audioFilename } =
+    const { filename: audioFilename } =
       await this.minioService.upload(audioFile);
 
     const audio = this.audioRepo.create({
@@ -35,11 +35,7 @@ export class AudioService {
 
     const createdAudio = await this.audioRepo.save(audio);
 
-    return {
-      ...omit(createdAudio, ['imageFilename', 'audioFilename']),
-      imageUrl,
-      audioUrl,
-    };
+    return this.mapAudioToAudioDto(createdAudio);
   }
 
   async read({ offset, limit, order }: ReadRecordsDto) {
@@ -82,11 +78,11 @@ export class AudioService {
     return this.mapAudioToAudioDto(deletedAudio);
   }
 
-  private async mapAudioToAudioDto(audio: Audio) {
+  private async mapAudioToAudioDto(audio: Audio): Promise<AudioDto> {
     return {
       ...omit(audio, ['imageFilename', 'audioFilename']),
-      imageUrl: await this.minioService.getFileUrl(audio.imageFilename),
-      audioUrl: await this.minioService.getFileUrl(audio.audioFilename),
+      thumbnail: this.minioService.getFileUrl(audio.imageFilename),
+      src: this.minioService.getFileUrl(audio.audioFilename),
     };
   }
 }

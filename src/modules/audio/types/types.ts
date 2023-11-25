@@ -81,12 +81,12 @@ export class AudioDto {
   @ApiProperty({ type: String, required: true })
   @IsString()
   @IsNotEmpty()
-  imageUrl: string;
+  thumbnail: string;
 
   @ApiProperty({ type: String, required: true })
   @IsString()
   @IsNotEmpty()
-  audioUrl: string;
+  src: string;
 }
 
 export class PaginatedResponseDto {

@@ -7,7 +7,7 @@ nestjs, minio, postgres
 ```bash
   cd audios-backend
 
-  docker compose up db minio -d
+  docker compose up -d
 
   yarn install
   yarn start:dev
