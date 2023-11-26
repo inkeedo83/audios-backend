@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MinioClientService } from 'src/modules/minio/services/minio.service';
 import { Audio } from '../entities/audio.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AudioDto, ReadRecordsDto, UpdateRecordDto } from '../types/types';
 import { omit } from 'lodash';
 
@@ -38,8 +38,11 @@ export class AudioService {
     return this.mapAudioToAudioDto(createdAudio);
   }
 
-  async read({ offset, limit, order }: ReadRecordsDto) {
+  async read({ offset, limit, order, pattern, filterBy }: ReadRecordsDto) {
     const [audios, count] = await this.audioRepo.findAndCount({
+      where: pattern
+        ? { title: Like(`%${pattern}%`), genre: filterBy }
+        : { genre: filterBy },
       skip: offset ?? 0,
       take: limit ?? 10,
       order: { genre: order ?? 'ASC' },

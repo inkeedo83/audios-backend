@@ -8,3 +8,25 @@ export const ORDERS = ['ASC', 'DESC'] as const;
 export const MINIO_HOST = process.env.MINIO_HOST
   ? String(process.env.MINIO_HOST)
   : 'localhost';
+
+export const CATEGORIES = [
+  'animals',
+  'food',
+  'meme',
+  'movie',
+  'music',
+  'nature',
+  'news',
+  'sport',
+] as const;
+
+export const CATS = [
+  'animals',
+  'food',
+  'meme',
+  'movie',
+  'music',
+  'nature',
+  'news',
+  'sport',
+];

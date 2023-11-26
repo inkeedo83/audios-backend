@@ -23,6 +23,7 @@ import {
   RecordIdDto,
   UpdateRecordDto,
 } from '../types/types';
+import { CATEGORIES, CATS } from 'src/constants/constants';
 
 @ApiTags('Audio')
 @Controller('audio')
@@ -42,7 +43,7 @@ export class AudioController {
       type: 'object',
       properties: {
         title: { type: 'string', nullable: false },
-        genre: { type: 'string', nullable: false },
+        genre: { enum: CATS, nullable: false, examples: CATEGORIES },
         image: {
           type: 'string',
           format: 'binary',
@@ -85,10 +86,8 @@ export class AudioController {
 
   @ApiResponse({ type: PaginatedResponseDto })
   @Get()
-  read(
-    @Query() { offset, limit, order }: ReadRecordsDto,
-  ): Promise<PaginatedResponseDto> {
-    return this.audioService.read({ offset, limit, order });
+  read(@Query() data: ReadRecordsDto): Promise<PaginatedResponseDto> {
+    return this.audioService.read(data);
   }
 
   @ApiResponse({ type: AudioDto })

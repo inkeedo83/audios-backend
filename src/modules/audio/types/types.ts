@@ -9,20 +9,21 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { ORDERS } from 'src/constants/constants';
+import { CATEGORIES, ORDERS } from 'src/constants/constants';
 
 export type Order = (typeof ORDERS)[number];
-
+export type Categories = (typeof CATEGORIES)[number];
 export class CreateRecordDto {
   @ApiProperty({ type: String, required: true, example: 'file title' })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ type: String, required: true, example: 'POP' })
+  @ApiProperty({ enum: CATEGORIES, required: true, example: CATEGORIES })
   @IsString()
   @IsNotEmpty()
-  genre: string;
+  @IsIn(CATEGORIES)
+  genre: Categories;
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {}
@@ -51,6 +52,16 @@ export class ReadRecordsDto {
   limit?: number | null;
 
   @ApiProperty({
+    enum: CATEGORIES,
+    required: false,
+    description: 'filter by genre',
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(CATEGORIES)
+  filterBy?: Categories;
+
+  @ApiProperty({
     type: String,
     required: false,
     description: 'ASC or DESC',
@@ -59,6 +70,15 @@ export class ReadRecordsDto {
   @IsString()
   @IsIn(ORDERS)
   order?: Order | null;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'title search pattern',
+  })
+  @IsOptional()
+  @IsString()
+  pattern?: string | null;
 }
 
 export class AudioDto {
